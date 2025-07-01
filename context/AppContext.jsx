@@ -1,99 +1,77 @@
-'use client'
+"use client";
+
 import { productsDummyData, userDummyData } from "@/assets/assets";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
+// Create the context
 export const AppContext = createContext();
 
-export const useAppContext = () => {
-    return useContext(AppContext)
-}
+export const AppContextProvider = ({ children }) => {
+  const router = useRouter();
+  const currency = process.env.NEXT_PUBLIC_CURRENCY;
 
-export const AppContextProvider = (props) => {
+  const [products, setProducts] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [isSeller, setIsSeller] = useState(true);
+  const [cartItems, setCartItems] = useState({});
 
-    const currency = process.env.NEXT_PUBLIC_CURRENCY
-    const router = useRouter()
+  // Dummy Fetchers (CSR Simulated)
+  useEffect(() => {
+    setProducts(productsDummyData);
+  }, []);
 
-    const [products, setProducts] = useState([])
-    const [userData, setUserData] = useState(false)
-    const [isSeller, setIsSeller] = useState(true)
-    const [cartItems, setCartItems] = useState({})
+  useEffect(() => {
+    setUserData(userDummyData);
+  }, []);
 
-    const fetchProductData = async () => {
-        setProducts(productsDummyData)
+  // Add to cart
+  const addToCart = (itemId) => {
+    const cartData = { ...cartItems };
+    cartData[itemId] = (cartData[itemId] || 0) + 1;
+    setCartItems(cartData);
+  };
+
+  // Update quantity
+  const updateCartQuantity = (itemId, quantity) => {
+    const cartData = { ...cartItems };
+    if (quantity <= 0) {
+      delete cartData[itemId];
+    } else {
+      cartData[itemId] = quantity;
     }
+    setCartItems(cartData);
+  };
 
-    const fetchUserData = async () => {
-        setUserData(userDummyData)
-    }
+  // Count
+  const getCartCount = () =>
+    Object.values(cartItems).reduce((acc, qty) => acc + qty, 0);
 
-    const addToCart = async (itemId) => {
+  // Amount
+  const getCartAmount = () =>
+    Math.floor(
+      Object.entries(cartItems).reduce((acc, [id, qty]) => {
+        const product = products.find((p) => p._id === id);
+        return product ? acc + product.offerPrice * qty : acc;
+      }, 0) * 100
+    ) / 100;
 
-        let cartData = structuredClone(cartItems);
-        if (cartData[itemId]) {
-            cartData[itemId] += 1;
-        }
-        else {
-            cartData[itemId] = 1;
-        }
-        setCartItems(cartData);
+  const value = {
+    currency,
+    router,
+    isSeller,
+    setIsSeller,
+    userData,
+    products,
+    cartItems,
+    addToCart,
+    updateCartQuantity,
+    getCartCount,
+    getCartAmount,
+  };
 
-    }
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
 
-    const updateCartQuantity = async (itemId, quantity) => {
-
-        let cartData = structuredClone(cartItems);
-        if (quantity === 0) {
-            delete cartData[itemId];
-        } else {
-            cartData[itemId] = quantity;
-        }
-        setCartItems(cartData)
-
-    }
-
-    const getCartCount = () => {
-        let totalCount = 0;
-        for (const items in cartItems) {
-            if (cartItems[items] > 0) {
-                totalCount += cartItems[items];
-            }
-        }
-        return totalCount;
-    }
-
-    const getCartAmount = () => {
-        let totalAmount = 0;
-        for (const items in cartItems) {
-            let itemInfo = products.find((product) => product._id === items);
-            if (cartItems[items] > 0) {
-                totalAmount += itemInfo.offerPrice * cartItems[items];
-            }
-        }
-        return Math.floor(totalAmount * 100) / 100;
-    }
-
-    useEffect(() => {
-        fetchProductData()
-    }, [])
-
-    useEffect(() => {
-        fetchUserData()
-    }, [])
-
-    const value = {
-        currency, router,
-        isSeller, setIsSeller,
-        userData, fetchUserData,
-        products, fetchProductData,
-        cartItems, setCartItems,
-        addToCart, updateCartQuantity,
-        getCartCount, getCartAmount
-    }
-
-    return (
-        <AppContext.Provider value={value}>
-            {props.children}
-        </AppContext.Provider>
-    )
-}
+// Optional custom hook for consuming
+export const useAppContext = () => useContext(AppContext);

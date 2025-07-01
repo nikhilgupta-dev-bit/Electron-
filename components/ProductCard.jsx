@@ -11,8 +11,10 @@ const ProductCard = ({ product }) => {
         <div
             onClick={() => { router.push('/product/' + product._id); scrollTo(0, 0) }}
             className="flex flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer"
+            style={{ perspective: '1000px' }}
         >
-            <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center">
+            <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center transition-transform duration-300 group-hover:rotate-x-6 group-hover:rotate-y-6 group-hover:scale-105 group-hover:shadow-2xl"
+                style={{ transformStyle: 'preserve-3d' }}>
                 <Image
                     src={product.image[0]}
                     alt={product.name}

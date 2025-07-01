@@ -2,18 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+
 * {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 @layer base {
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+  html {
+    font-family: 'Inter', sans-serif;
+    background-color: theme('colors.background');
+    color: theme('colors.foreground');
+    min-height: 100vh;
   }
+  html.dark {
+    background-color: #18181b;
+    color: #161616;
+  }
+  body {
+    @apply bg-inherit text-inherit min-h-screen;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
 
 ::-webkit-scrollbar {
-  display: none;
+  width: 8px;
+  background: #2b2c2e;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
 }
