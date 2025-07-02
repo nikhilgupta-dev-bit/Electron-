@@ -1,5 +1,5 @@
 import { serve } from "inngest/next";
-import { inngest } from ".@/config/inngest";
+import { inngest } from "@/config/inngest";
 import { syncCreation } from "@/config/inngest";
 import { syncUserUpdate } from "@/config/inngest";
 import { syncUserDelete } from "@/config/inngest";
